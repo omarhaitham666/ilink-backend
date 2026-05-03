@@ -20,6 +20,7 @@ class AuthController extends Controller
             'message' => 'Registered successfully',
             'user' => $user
         ]);
+
     }
 
     public function login(LoginRequest $request)

@@ -8,21 +8,23 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
-    public function register(array $data)
-    {
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'age' => $data['age'],
-            'gender' => $data['gender'],
-        ]);
+   public function register(array $data)
+{
+    $user = User::create([
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'password' => Hash::make($data['password']),
+        'age' => $data['age'],
+        'gender' => $data['gender'],
+    ]);
 
-        Auth::login($user);
+    // 👇 الحل الحقيقي
 
-        return $user;
-    }
+        Auth::login($user); // 👈 فقط ده
+    session()->regenerate();
 
+    return $user;
+}
     public function login(array $data)
     {
         if (!Auth::attempt($data)) {
