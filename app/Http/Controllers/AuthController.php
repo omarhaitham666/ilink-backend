@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\Auth\AuthService;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -14,44 +14,39 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-        $user = $this->authService->register($request->validated());
+        $data = $this->authService->register($request->validated());
 
         return response()->json([
             'message' => 'Registered successfully',
-            'user' => $user
+            'user' => $data['user'],
+            'token' => $data['token']
         ]);
-
     }
 
     public function login(LoginRequest $request)
     {
-        $user = $this->authService->login($request->validated());
-
-        if (!$user) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
-        }
+        $data = $this->authService->login($request->validated());
 
         return response()->json([
             'message' => 'Logged in successfully',
-            'user' => $user
+            'user' => $data['user'],
+            'token' => $data['token']
         ]);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        $this->authService->logout();
+        $this->authService->logout($request->user());
 
         return response()->json([
-            'message' => 'Logged out'
+            'message' => 'Logged out successfully'
         ]);
     }
 
-    public function me()
+    public function me(Request $request)
     {
         return response()->json([
-            'user' => $this->authService->me()
+            'user' => $this->authService->me($request->user())
         ]);
     }
 }

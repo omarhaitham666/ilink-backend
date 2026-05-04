@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
-   public function register(array $data)
+ public function register(array $data)
 {
     $user = User::create([
         'name' => $data['name'],
@@ -18,29 +18,38 @@ class AuthService
         'gender' => $data['gender'],
     ]);
 
-    // 👇 الحل الحقيقي
+    $token = $user->createToken('auth_token')->plainTextToken;
 
-        Auth::login($user); // 👈 فقط ده
-    session()->regenerate();
-
-    return $user;
+    return [
+        'user' => $user,
+        'token' => $token,
+    ];
 }
-    public function login(array $data)
-    {
-        if (!Auth::attempt($data)) {
-            return null;
-        }
 
-        return Auth::user();
+public function login(array $data)
+{
+    $user = User::where('email', $data['email'])->first();
+
+    if (!$user || !Hash::check($data['password'], $user->password)) {
+        return null;
     }
 
-    public function logout()
-    {
-        Auth::logout();
-    }
+    $token = $user->createToken('auth_token')->plainTextToken;
 
-    public function me()
-    {
-        return Auth::user();
-    }
+    return [
+        'user' => $user,
+        'token' => $token,
+    ];
+}
+public function logout(User $user)
+{
+    $user->tokens()->delete();
+}
+
+public function me(User $user)
+{
+    return $user;
+    return auth()->user();
+} 
+
 }
